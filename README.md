@@ -1,5 +1,11 @@
 # metaLoc protein localisation pipeline
-metaLoc is a reproducible [NextFlow](https://www.nature.com/articles/nbt.3820) workflow for protein localisation prediction utilising publicly available tools from both protein amino acid (aa) sequences or, in "meta" mode, from metagenomic nucleotide (nt) sequences. The workflow schematic can be seen below:
+metaLoc is a reproducible [NextFlow](https://www.nature.com/articles/nbt.3820) workflow for protein localisation prediction utilising publicly available tools from both protein amino acid (aa) sequences or, in "meta" mode, from metagenomic nucleotide (nt) sequences. 
+
+The main aim of this workflow is to rapidly accelerate investigation of large protein datasets by combining multiple tools quickly and easily for users to obtain bioinformatically isolated subsets of proteins with characteristics of interest, e.g. *in silico* secretomes.
+
+For each protein sequence provided, or derived from contig sequences provided, the results of the user-selected tools for protein characterisation are provided individually and also in merged results tables ready for post-workflow filtering.
+
+The workflow schematic can be seen below:
 
 <img src="docs/workflow.png" width="70%">
 
@@ -8,3 +14,6 @@ The core workflow accepts protein sequence .fasta files as the input. For both e
 
 ## Meta mode
 For metagenomic nucleotide sequences (e.g. contigs) of known eukaryotic or prokaryotic origin, protein sequences can be predicted from the nucleotide sequences. [AUGUSTUS 3.5.0](https://academic.oup.com/bioinformatics/article/24/5/637/202844) is used alongside the user selected gene model to predict coding sequences from eukaryotic contigs. [Prodigal 2.6.3](https://link.springer.com/article/10.1186/1471-2105-11-119) is used for ORF prediction from prokaryotic contigs. For sequences of unknown origin (e.g. shotgun metagenomic contigs), [EukRep 0.6.7](https://pmc.ncbi.nlm.nih.gov/articles/PMC5880246/) is utilised for taxonomic classification of contigs into eukaryotic or prokaryotic contig sequences. Both branches of the pipeline are then performed simultaneously.  
+
+# Requirements
+
