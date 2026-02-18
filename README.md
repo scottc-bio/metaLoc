@@ -1,4 +1,5 @@
 # metaLoc protein localisation pipeline
+## Introduction
 metaLoc is a reproducible [NextFlow](https://www.nature.com/articles/nbt.3820) workflow for protein localisation prediction utilising publicly available tools from both protein amino acid (aa) sequences or, in "meta" mode, from metagenomic nucleotide (nt) sequences. 
 
 The main aim of this workflow is to rapidly accelerate investigation of large protein datasets by combining multiple tools quickly and easily for users to obtain bioinformatically isolated subsets of proteins with characteristics of interest, e.g. *in silico* secretomes.
