@@ -30,6 +30,8 @@ For metagenomic nucleotide sequences (e.g. contigs) of known eukaryotic or proka
 
 # Installation
 
+Clone the repository and move into the workflow directory.
+
 ```bash
 
 git clone https://github.com/scottc-bio/metaLoc.git
@@ -37,4 +39,22 @@ cd metaLoc
 
 ```
 
+# Licensed software setup
 
+[SignalP 6.0](https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=6.0&packageversion=6.0i&platform=fast), [DeepLoc 2.1](https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=deeploc&version=2.1&packageversion=2.1&platform=All), and [Phobius 1.01](https://software.sbc.su.se/phobius.html) distributed under separate academic licenses and cannot therefore be distributed in this repository. Users must obtain these tools directly from the official websites and agree to licensing terms.
+
+After downloading the relevant compressed archives for each tool, place them in the 'assets/' directory where the Nextflow workflow will automatically configure and use them during execution. No further manual installation is required.
+
+*Expected file names*
+
+- SignalP 6.0 - signalp-6.0i.fast.tar.gz
+- DeepLoc 2.1 - deeploc-2.1.All.tar.gz
+- Phobius 1.01 - phobius101_linux.tgz
+
+*The workflow automatically expects files with matching names to exist in the 'assets/' directory. However, the workflow can be directed to files with differing names using parameters for each compressed archive (see [Parameters](docs/README.md#Parameters)).
+
+
+
+
+
+# Parameters
