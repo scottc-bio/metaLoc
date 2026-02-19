@@ -1,30 +1,32 @@
-# metaLoc protein localisation workflow
+# metaLoc: Protein localisation prediction workflow
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.10.2-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 
 ## Introduction
-metaLoc is a reproducible [NextFlow](https://www.nature.com/articles/nbt.3820) workflow for protein localisation prediction utilising publicly available tools from both protein amino acid (aa) sequences or, in `--meta` mode, from metagenomic nucleotide (nt) sequences. 
+metaLoc is a reproducible [NextFlow](https://www.nature.com/articles/nbt.3820) workflow for protein localisation prediction from protein amino acid sequences or, in `--meta` mode, from metagenomic nucleotide sequences. 
 
-The main aim of this workflow is to rapidly accelerate investigation of large protein datasets by combining multiple tools quickly and easily for users to obtain bioinformatically isolated subsets of proteins with characteristics of interest, e.g. *in silico* secretomes.
+This workflow accelerates the investigation of large protein datasets by combining multiple publicly-available tools for the identification of biologically-relevant subsets (e.g. predicted secretomes).
 
-For each protein sequence provided, or derived from contig sequences provided, the results of the user-selected tools for protein characterisation are provided individually and also in merged results tables ready for post-workflow filtering.
+Individual tool outputs and merged results tables are produced to allow simple downstream filtering and analysis.
 
 The workflow schematic can be seen below:
 
 <img src="docs/workflow.png" width="70%">
 
 ## Core workflow
-The core workflow accepts protein sequence .fasta files as the input. For both eukaryotic and prokaryotic sequences the workflow utilises [SignalP 6.0](https://www.nature.com/articles/s41587-021-01156-3) in `euk` mode for eukaryotic sequences and in `other` mode for prokaryotic sequences for signal peptide prediction. Next [DeepLoc 2.1](https://academic.oup.com/nar/article/52/W1/W215/7642068) is utilised for eukaryotic protein localisation, and [DeepLocPro 1.0](https://academic.oup.com/bioinformatics/article/40/12/btae677/7900293) for prokaryotic protein localisation. Finally, transmembrane helices prediction is performed utilising either [Phobius 1.01](https://academic.oup.com/nar/article/35/suppl_2/W429/2920784) or [DeepTMHMM 1.0](https://www.biorxiv.org/content/10.1101/2022.04.08.487609v1) depending on the user preference. Despite its improved accuraccy, DeepTMHMM implemented here uploads sequences to the DeepTMHMM server for processing which could be time consuming for large datasets and unsuitable for sensitive data.
+Protein sequences are the input for the core workflow. For both eukaryotic and prokaryotic sequences the workflow utilises [SignalP 6.0](https://www.nature.com/articles/s41587-021-01156-3) in `euk` mode for eukaryotic sequences and in `other` mode for prokaryotic sequences for signal peptide prediction. Next [DeepLoc 2.1](https://academic.oup.com/nar/article/52/W1/W215/7642068) is utilised for eukaryotic protein localisation prediction, and [DeepLocPro 1.0](https://academic.oup.com/bioinformatics/article/40/12/btae677/7900293) for prokaryotic protein localisation prediction. Finally, transmembrane helices prediction is performed by [Phobius 1.01](https://academic.oup.com/nar/article/35/suppl_2/W429/2920784) or [DeepTMHMM 1.0](https://www.biorxiv.org/content/10.1101/2022.04.08.487609v1). 
+
+*N.B. DeepTMHMM in this workflow relies on sequence upload for processing, which could be time consuming and unsuitable for sensitive datasets.*
 
 ## Meta mode
-For metagenomic nucleotide sequences (e.g. contigs) of known eukaryotic or prokaryotic origin, protein sequences can be predicted from the nucleotide sequences. [AUGUSTUS 3.5.0](https://academic.oup.com/bioinformatics/article/24/5/637/202844) is used alongside the user selected gene model to predict coding sequences from eukaryotic contigs. [Prodigal 2.6.3](https://link.springer.com/article/10.1186/1471-2105-11-119) is used for ORF prediction from prokaryotic contigs. For sequences of unknown origin (e.g. shotgun metagenomic contigs), [EukRep 0.6.7](https://pmc.ncbi.nlm.nih.gov/articles/PMC5880246/) is utilised for taxonomic classification of contigs into eukaryotic or prokaryotic contig sequences. Both branches of the pipeline are then performed simultaneously.  
+In `--meta` mode, protein sequences can be predicted from the nucleotide sequences. [AUGUSTUS 3.5.0](https://academic.oup.com/bioinformatics/article/24/5/637/202844) utilised the user-selected model to predict genes from eukaryotic contigs. [Prodigal 2.6.3](https://link.springer.com/article/10.1186/1471-2105-11-119) performs ORF prediction from prokaryotic contigs. For sequences of unknown origin or from mixed community sample, [EukRep 0.6.7](https://pmc.ncbi.nlm.nih.gov/articles/PMC5880246/) can be utilised for kingdom classification of contigs into eukaryotic or prokaryotic sequences. Both branches of the pipeline are then performed simultaneously.
 
 # Requirements
 
-- Nextflow ≥ 25.10.2 (see installation instructions at [Nextflow](https://www.nextflow.io/docs/latest/install.html))
+- [Nextflow](https://www.nextflow.io/docs/latest/install.html) ≥ 25.10.2
   - Tested in 25.10.2 and 25.10.4
-- Miniconda, Conda, or Mamba (see installation instructions at [Conda](https://docs.conda.io/en/latest/))
+- [Miniconda, Conda, or Mamba](https://docs.conda.io/en/latest/) 
 
 *N.B. This workflow was built and tested on a Linux system with local execution*
 
@@ -41,21 +43,19 @@ cd metaLoc
 
 # Licensed software setup
 
-[SignalP 6.0](https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=6.0&packageversion=6.0i&platform=fast), [DeepLoc 2.1](https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=deeploc&version=2.1&packageversion=2.1&platform=All), and [Phobius 1.01](https://software.sbc.su.se/phobius.html) distributed under separate academic licenses and cannot therefore be distributed in this repository. Users must obtain these tools directly from the official websites and agree to licensing terms.
+[SignalP 6.0](https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=6.0&packageversion=6.0i&platform=fast), [DeepLoc 2.1](https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=deeploc&version=2.1&packageversion=2.1&platform=All), and [Phobius 1.01](https://software.sbc.su.se/phobius.html) are distributed under separate academic licenses and cannot therefore be distributed in this repository. Users must obtain these tools directly from the official websites and agree to licensing terms.
 
 After downloading the relevant compressed archives for each tool, place them in the `assets/` directory where the Nextflow workflow will automatically configure and use them during execution. No further manual installation is required.
 
-*Expected file names*
+**Expected file names:**
 
 - SignalP 6.0 - signalp-6.0i.fast.tar.gz
 - DeepLoc 2.1 - deeploc-2.1.All.tar.gz
 - Phobius 1.01 - phobius101_linux.tgz
 
-*The workflow automatically expects files with matching names to exist in the `assets/` directory. However, the workflow can be directed to files with differing names using parameters for each compressed archive (see [Parameters](#parameters)).*
-
 # Initial setup
 
-Running the test profile will prepare almost all nececssary environments for the workflow except for the optional DeepTMHMM tool.
+Running the test profile will verify the install and prepare almost all necessary environments for the workflow except for the optional DeepTMHMM tool.
 
 ```bash
 
@@ -63,12 +63,10 @@ nextflow run . -profile test
 
 ```
 
-This will use `assets/test.fasta` which contains the two contig sequences:
+This will use `assets/test.fasta` which contains two nucleotide sequences:
 
 - The first 10 Kbp of the first contig of the *Aspergillus nidulans* var. *acristatus* genome assembly [GCA_047715555.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_047715555.1/)
 - The first 10 Kbp of the first contig of the *Escherichia coli* metagenomic genome assembly [GCA_977857295.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_977857295.1/)
-
-The workflow will be run in `mixed` mode (see [Parameters](#parameters)), to utilise the entire workflow with Phobius 1.01 as the transmembrane helix predictor.
 
 # Parameters
 
@@ -79,7 +77,7 @@ The workflow will be run in `mixed` mode (see [Parameters](#parameters)), to uti
 | `--meta` | No | `false` | Enables metagenomic mode (`euk`, `other`, or `mixed`). |
 | `--augustus_model` | Conditional | – | Augustus species model. Required when `--meta` is `euk` or `mixed`. |
 | `--min_contig_len` | Conditional | – | Minimum contig length for EukRep filtering. Required when `--meta` is `mixed`. |
-| `--deeptmhmm` | No | `false` | Use DeepTMHMM instead of Phobius for TM prediction (`true`). |
+| `--deeptmhmm` | No | `false` | Use DeepTMHMM instead of Phobius for TM prediction (set to `true`). |
 | `--signalptar` | No | `assets/signalp-6.0i.fast.tar.gz` | Path to SignalP archive. |
 | `--deeploctar` | No | `assets/deeploc-2.1.All.tar.gz` | Path to DeepLoc archive. |
 | `--phobiustar` | No | `assets/phobius101_linux.tgz` | Path to Phobius archive. |
@@ -100,15 +98,24 @@ EukRep is unreliable on short contigs. Therefore a minimum contig length must be
 
 # Outputs
 
-For the core pipeline two main directories will be produced in the `results/` directory:
+Results will be written to the `results/` directory:
 
-- Tool specific outputs - Named according to input .fasta file and containing the full outputs from each tool used in subdirectories named after each tool.
-- Final output - Named according to input .fasta file with `_final` suffix and containing two .tsv files of merged results from the core pipeline tools used with one line per protein:
-  - `final_merged.tsv` - All columns from all tool outputs merged.
-  - `final_concise.tsv` - Major columns of interest from all tool outputs merged.
+- **Tool specific outputs**
+  Named according to input .fasta file and containing the full outputs from each tool used in subdirectories.
 
-In `meta` mode, additional outputs will be produced from each tool used e.g. for AUGUSTUS, Prodigal, and EukRep.
+- **Final output**
+  Named according to input .fasta file with `_final` suffix and containing:
+  - `final_merged.tsv` - All columns from all tool outputs
+  - `final_concise.tsv` - Key columns from outputs
 
-The `work/` directory contains subdirectories for each process. This allows the input, intermediate, and output files to be explored for each tool.
+In `meta` mode, additional outputs from AUGUSTUS, Prodigal, and EukRep are produced.
 
-In `mixed` mode, separate final results will be produced for eukaryotic and prokaryotic sequences.
+The `work/` directory contains per-process intermediate files generated by Nextflow.
+
+In `mixed` mode, separate final results are produced for eukaryotic and prokaryotic sequences.
+
+# License
+
+This project is distributed under the MIT License. See [LICENSE](LICENSE) for details.
+
+External tools used by this workflow are distributed under their own licenses and must be obtained separately.
