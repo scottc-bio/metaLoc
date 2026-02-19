@@ -53,8 +53,62 @@ After downloading the relevant compressed archives for each tool, place them in 
 
 *The workflow automatically expects files with matching names to exist in the 'assets/' directory. However, the workflow can be directed to files with differing names using parameters for each compressed archive (see [Parameters](#parameters)).*
 
+# Initial setup
 
+Running the test profile will prepare almost all nececssary environments for the workflow except for the optional DeepTMHMM tool.
 
+```bash
 
+nextflow run . -profile test
+
+```
+
+This will use 'assets/test.fasta', which contains the two contig sequences:
+
+- The first 10 Kbp of the first contig of the *Aspergillus nidulans* var. *acristatus* genome assembly [GCA_047715555.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_047715555.1/)
+- The first 10 Kbp of the first contig of the *Escherichia coli* metagenomic genome assembly [GCA_977857295.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_977857295.1/)
+
+The workflow will be run in 'mixed' mode (see [Parameters](#parameters)), to utilise the entire workflow with Phobius 1.01 as the transmembrane helix predictor.
 
 # Parameters
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `--fasta` | Yes | – | Input FASTA file containing protein or contig sequences |
+| `--organism` | Yes* | – | Organism type (`euk` for eukaryotic sequences or `other` for prokaryotic sequences). Required when `--meta` is false. |
+| `--meta` | No | `false` | Enables metagenomic mode (`euk`, `other`, or `mixed`). |
+| `--augustus_model` | Conditional | – | Augustus species model. Required when `--meta` is `euk` or `mixed`. |
+| `--min_contig_len` | Conditional | – | Minimum contig length for EukRep filtering. Required when `--meta` is `mixed`. |
+| `--deeptmhmm` | No | `false` | Use DeepTMHMM instead of Phobius for TM prediction (`true`). |
+| `--signalptar` | No | `assets/signalp-6.0i.fast.tar.gz` | Path to SignalP archive. |
+| `--deeploctar` | No | `assets/deeploc-2.1.All.tar.gz` | Path to DeepLoc archive. |
+| `--phobiustar` | No | `assets/phobius101_linux.tgz` | Path to Phobius archive. |
+
+## AUGUSTUS models
+AUGUSTUS *ab initio* gene prediction requires a gene model to be selected. To view the list of possible models use:
+
+```bash
+
+cat assets/augustus_model_list.txt
+
+```
+*N.B. Gene-models are species-specific and strongly affect gene prediction*
+
+## EukRep filtering
+
+EukRep is unreliable on short contigs. Therefore a minimum contig length must be selected which will be applied to input sequences prior to kingdom classification. Values >= 3000 bp are recommended, and values <= 1000 bp are strongly discouraged.
+
+# Outputs
+
+For the core pipeline two main directories will be produced in the 'results/' directory:
+
+- Tool specific outputs - Named according to input .fasta file and containing the full outputs from each tool used in subdirectories named after each tool.
+- Final output - Named according to input .fasta file with '_final' suffix and containing two .tsv files of merged results from the core pipeline tools used with one line per protein:
+  - final_merged.tsv - All columns from all tool outputs merged.
+  - final_concise.tsv - Major columns of interest from all tool outputs merged.
+
+In 'meta' mode, additional outputs will be produced from each tool used e.g. for AUGUSTUS, Prodigal, and EukRep.
+
+The 'work/' directory contains subdirectories for each process. This allows the input, intermediate, and output files to be explored for each tool.
+
+In 'mixed' mode, separate final results will be produced for eukaryotic and prokaryotic sequences.
