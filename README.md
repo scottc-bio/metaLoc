@@ -1,4 +1,8 @@
 # metaLoc protein localisation pipeline
+
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.10.2-23aa62.svg)](https://www.nextflow.io/)
+[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
+
 ## Introduction
 metaLoc is a reproducible [NextFlow](https://www.nature.com/articles/nbt.3820) workflow for protein localisation prediction utilising publicly available tools from both protein amino acid (aa) sequences or, in "meta" mode, from metagenomic nucleotide (nt) sequences. 
 
@@ -18,3 +22,8 @@ For metagenomic nucleotide sequences (e.g. contigs) of known eukaryotic or proka
 
 # Requirements
 
+- Nextflow ≥ 25.10.2 (see installation instructions at [Nextflow](https://www.nextflow.io/docs/latest/install.html))
+  - Tested in 25.10.2 and 25.10.4
+- Miniconda, Conda, or Mamba (see installation instructions at [Conda](https://docs.conda.io/en/latest/))
+
+*N.B. This workflow was built and tested on a Linux system with local execution*
