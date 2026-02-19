@@ -1,0 +1,11 @@
+name: deeploc2
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.10
+  - pip
+  - libstdcxx-ng>=12
+  - pytorch=2.0.*
+  - cpuonly
+  - setuptools<70

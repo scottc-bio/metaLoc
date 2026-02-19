@@ -1,0 +1,7 @@
+name: phobius
+channels:
+  - predector
+  - conda-forge
+  - defaults
+dependencies:
+  - phobius

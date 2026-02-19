@@ -1,0 +1,9 @@
+name: augustus
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - augustus=3.5.0
+  - gffread

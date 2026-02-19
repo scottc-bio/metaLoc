@@ -1,0 +1,24 @@
+# Nextflow
+work/
+results/
+.nextflow*
+.nextflow.log*
+trace.txt
+timeline.html
+report.html
+dag.html
+
+# User input
+input/
+
+# Conda
+.conda-envs/
+*.conda
+
+# Python
+__pycache__/
+*.pyc
+
+# OS junk
+.DS_Store
+

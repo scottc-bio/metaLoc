@@ -1,0 +1,11 @@
+name: signalp6
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy<2
+  - pytorch
+  - torchvision
+  - torchaudio

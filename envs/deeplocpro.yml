@@ -1,0 +1,22 @@
+name: deeplocpro
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # Core
+  - python=3.9
+  - pip
+
+  # Deep learning backend
+  - tensorflow<2.16
+
+  # Required utilities
+  - numpy
+  - pandas
+  - tqdm
+  - scikit-learn
+
+  # Install DeepLocPro itself
+  - pip:
+      - git+https://github.com/Jaimomar99/deeplocpro.git
