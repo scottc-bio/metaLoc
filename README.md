@@ -51,7 +51,7 @@ After downloading the relevant compressed archives for each tool, place them in 
 - DeepLoc 2.1 - deeploc-2.1.All.tar.gz
 - Phobius 1.01 - phobius101_linux.tgz
 
-*The workflow automatically expects files with matching names to exist in the 'assets/' directory. However, the workflow can be directed to files with differing names using parameters for each compressed archive (see [Parameters](docs/README.md#Parameters)).
+*The workflow automatically expects files with matching names to exist in the 'assets/' directory. However, the workflow can be directed to files with differing names using parameters for each compressed archive (see [Parameters](#Parameters)).*
 
 
 
