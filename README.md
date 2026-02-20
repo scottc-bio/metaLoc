@@ -20,7 +20,7 @@ Protein sequences are the input for the core workflow. For both eukaryotic and p
 *N.B. DeepTMHMM in this workflow relies on sequence upload for processing, which could be time consuming and unsuitable for sensitive datasets.*
 
 ## Meta mode
-In `--meta` mode, protein sequences can be predicted from the nucleotide sequences. [AUGUSTUS 3.5.0](https://academic.oup.com/bioinformatics/article/24/5/637/202844) utilised the user-selected model to predict genes from eukaryotic contigs. [Prodigal 2.6.3](https://link.springer.com/article/10.1186/1471-2105-11-119) performs ORF prediction from prokaryotic contigs. For sequences of unknown origin or from mixed community sample, [EukRep 0.6.7](https://pmc.ncbi.nlm.nih.gov/articles/PMC5880246/) can be utilised for kingdom classification of contigs into eukaryotic or prokaryotic sequences. Both branches of the pipeline are then performed simultaneously.
+In `--meta` mode, protein sequences can be predicted from the nucleotide sequences. [AUGUSTUS 3.5.0](https://academic.oup.com/bioinformatics/article/24/5/637/202844) utilised the user-selected model to predict genes from eukaryotic contigs. [Prodigal 2.6.3](https://link.springer.com/article/10.1186/1471-2105-11-119) performs ORF prediction from prokaryotic contigs. For sequences of unknown origin or from mixed community sample, [EukRep 0.6.7](https://pmc.ncbi.nlm.nih.gov/articles/PMC5880246/) can be utilised for life domain classification of contigs into eukaryotic or prokaryotic sequences. Both branches of the workflow are then performed simultaneously.
 
 # Requirements
 
@@ -94,7 +94,7 @@ cat assets/augustus_model_list.txt
 
 ## EukRep filtering
 
-EukRep is unreliable on short contigs. Therefore a minimum contig length must be selected which will be applied to input sequences prior to kingdom classification. Values >= 3000 bp are recommended, and values <= 1000 bp are strongly discouraged.
+EukRep is unreliable on short contigs. Therefore a minimum contig length must be selected which will be applied to input sequences prior to life domain classification. Values >= 3000 bp are recommended, and values <= 1000 bp are strongly discouraged.
 
 # Outputs
 
