@@ -111,7 +111,7 @@ Results will be written to the `results/` directory:
 
 All potential output columns in the final concise results tables:
 
-| Column | Pipeline branch | Description |
+| Column | Workflow branch | Description |
 |-----------|----------|---------|
 | ID_merge | Both | ID of processed protein sequences |
 | signalp_Prediction | Both | SignalP prediction of signal peptide |
