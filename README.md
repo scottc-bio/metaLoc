@@ -31,6 +31,32 @@ In `--meta` mode, protein sequences can be predicted from the nucleotide sequenc
 
 *N.B. This workflow was built and tested on a Linux server with Ubuntu 18.04.6 LTS with dual Intel Xeon Gold 6130 processors. In total, 64 CPUs and 248 GB RAM were available. By default, each process of the workflow is allocated 4 CPUs and 8 Gb RAM.**
 
+## Nextflow environment setup
+
+To install Nextflow using conda, create a dedicated environment.
+
+```bash
+
+conda create -n nextflow_env -c conda-forge -c bioconda nextflow
+
+```
+
+Then activate the environment to use nextflow to run the metaLoc workflow.
+
+```bash
+
+conda activate nextflow_env
+
+```
+
+Check the installation of nextflow.
+
+```bash
+
+nextflow -version
+
+```
+
 # Installation
 
 Clone the repository and move into the workflow directory.
