@@ -56,7 +56,7 @@ process SETUP_SIGNALP {
 process RUN_SIGNALP {
     conda 'envs/signalp6.yml'
 
-    publishDir "results/${fasta.baseName}", mode: 'copy'
+    publishDir { "results/${fasta.baseName}" }, mode: 'copy'
 
     input:
         path fasta
@@ -84,10 +84,18 @@ EOF
 
         cp signalp_out/prediction_results.txt signalp_out/signalp_results.txt
 
-        tar -czf signalp_out/signalp_plots.tar.gz signalp_out/*_plot.txt
-        rm signalp_out/*_plot.txt
+        seq_count=\$(grep -c '^>' "$fasta")
 
-        rm signalp_out/prediction_results.txt
+        if [ "\$seq_count" -le 1000 ]; then
+            if find signalp_out -maxdepth 1 -type f -name '*_plot.txt' | grep -q .; then
+                find signalp_out -maxdepth 1 -type f -name '*_plot.txt' -print0 | \\
+                    tar --null -czf signalp_out/signalp_plots.tar.gz --files-from=-
+            fi
+        fi
+
+        find signalp_out -maxdepth 1 -type f -name '*_plot.txt' -delete
+
+        rm -f signalp_out/prediction_results.txt
     fi
     """
 }
@@ -96,22 +104,32 @@ process SETUP_DEEPLOC {
     cache 'deep'
     conda 'envs/deeploc2.yml'
 
-    input: path tarball
+    input:
+        path tarball
 
-    output: path "deeploc.installed", emit: installed
+    output:
+        path "deeploc.installed", emit: installed
 
     script:
     """
-    mkdir -p assets/deeploc2
-    tar -xzf "$tarball" -C assets/deeploc2
-    pip install assets/deeploc2/deeploc2_package
+    tar -xzf "$tarball"
+
+    cd deeploc2_package
+
+    pip install .
+
+    cd ..
+
+    python -c "import DeepLoc2; print('DeepLoc2 installation OK')"
+
     touch deeploc.installed
     """
 }
 
 process RUN_DEEPLOC {
     conda 'envs/deeploc2.yml'
-    publishDir "results/${fasta.baseName}", mode: 'copy'
+
+    publishDir { "results/${fasta.baseName}" }, mode: 'copy'
 
     input:
         path fasta
@@ -136,7 +154,7 @@ process RUN_DEEPLOC {
 process RUN_DEEPLOCPRO {
     conda 'envs/deeplocpro.yml'
 
-    publishDir "results/${fasta.baseName}", mode: 'copy'
+    publishDir { "results/${fasta.baseName}" }, mode: 'copy'
 
     input: path fasta
 
@@ -162,7 +180,7 @@ process RUN_DEEPLOCPRO {
 process RUN_DEEPTMHMM {
     conda 'envs/deeptmhmm.yml'
 
-    publishDir "results/${fasta.baseName}", mode: 'copy'
+    publishDir { "results/${fasta.baseName}" }, mode: 'copy'
 
     input:
         path fasta
@@ -198,7 +216,7 @@ process RUN_PHOBIUS {
     conda 'envs/phobius.yml'
     maxForks 1
 
-    publishDir "results/${fasta.baseName}", mode: 'copy'
+    publishDir { "results/${fasta.baseName}" }, mode: 'copy'
 
     input:
         path fasta
@@ -226,7 +244,9 @@ process RUN_PHOBIUS {
 
     PHOBIUS_DIR="\$CONDA_PREFIX/share/phobius-1.01-5"
 
-    phobius-register "$tarball"
+    if [ ! -f "\$PHOBIUS_DIR/decodeanhmm" ]; then
+        phobius-register "$tarball"
+    fi
 
     PHOBIUS_PL="\$CONDA_PREFIX/share/phobius-1.01-5/phobius.pl"
 
@@ -332,12 +352,16 @@ process RUN_EUKREP {
     output:
         path "euk_contigs.fasta", emit: euk
         path "prok_contigs.fasta", emit: prok
+        path "short_contigs.fasta", emit: short
         path "filtered_contigs.fasta", emit: filtered
 
     script:
+    def max_len = min_contig_len - 1
     """
-    # Filter contigs by length BEFORE classification
+    # Split contigs by length FIRST
     seqkit seq -m ${min_contig_len} "$contigs" > filtered_contigs.fasta
+    seqkit seq -M ${max_len} "$contigs" > short_contigs.fasta
+
     # Handle edge case: nothing left after filtering
     if [ ! -s filtered_contigs.fasta ]; then
         touch euk_contigs.fasta
@@ -353,22 +377,36 @@ process RUN_EUKREP {
 }
 
 process MERGE_RESULTS {
+    tag "${name}"
     conda 'envs/merge_results.yml'
+
+    publishDir { "results/${name}_final" }, mode: 'copy'
 
     input:
         tuple path(fasta), val(name)
         path txts
         path script
 
-    publishDir "results/${name}_final", mode: 'copy'
-
     output:
         path "final_merged.tsv"
-        file "final_concise.tsv"
+        path "final_concise.tsv"
 
     script:
     """
     python "$script" ${txts.join(' ')}
+    """
+}
+
+process RENAME_SHORT {
+    input:
+        path fasta
+
+    output:
+        path "short_proteins.faa"
+
+    script:
+    """
+    cp "$fasta" short_proteins.faa
     """
 }
 
@@ -391,6 +429,15 @@ workflow RUN_PRODIGAL_WRAPPER {
     take: fasta_ch
     main:
         proteins_ch = RUN_PRODIGAL(fasta_ch).proteins
+    emit: proteins_ch
+}
+
+// Wrap SHORT proteins in a workflow
+workflow RUN_SHORT_WRAPPER {
+    take: fasta_ch
+    main:
+        prodigal_out = RUN_PRODIGAL(fasta_ch)
+        proteins_ch = RENAME_SHORT(prodigal_out.proteins)
     emit: proteins_ch
 }
 
@@ -492,6 +539,29 @@ workflow RUN_CORE_PROK {
         CORE_PIPELINE(
             fasta_ch,
             'other',
+            signalp_models_ch,
+            deeploc_installed_ch,
+            parser_ch,
+            phobius_tar_ch,
+            merge_script_ch,
+            deeptmhmm_val
+        )
+}
+
+workflow RUN_CORE_SHORT {
+    take:
+        fasta_ch
+        signalp_models_ch
+        deeploc_installed_ch
+        parser_ch
+        phobius_tar_ch
+        merge_script_ch
+        deeptmhmm_val
+
+    main:
+        CORE_PIPELINE(
+            fasta_ch,
+            'other',   // treat as prokaryotic
             signalp_models_ch,
             deeploc_installed_ch,
             parser_ch,
@@ -617,19 +687,48 @@ workflow {
 
     }
     else if (params.meta == 'mixed') {
-        // Split contigs with EukRep
+
+        // Split contigs
         eukrep_out = RUN_EUKREP(fasta_ch, params.min_contig_len)
 
-        // Run eukaryotic branch
+        // --- Eukaryotic branch ---
         euk_proteins_ch = RUN_AUGUSTUS_WRAPPER(eukrep_out.euk)
 
-        // Run prokaryotic branch
+        // --- Prokaryotic branch ---
         prok_proteins_ch = RUN_PRODIGAL_WRAPPER(eukrep_out.prok)
 
-        RUN_CORE_EUK(euk_proteins_ch, signalp_models_ch, deeploc_installed_ch,
-                     parser_ch, phobius_tar_ch, merge_script_ch, params.deeptmhmm)
+        // --- Short contigs branch ---
+        short_proteins_ch = RUN_SHORT_WRAPPER(eukrep_out.short)
 
-        RUN_CORE_PROK(prok_proteins_ch, signalp_models_ch, deeploc_installed_ch,
-                      parser_ch, phobius_tar_ch, merge_script_ch, params.deeptmhmm)
+        // Run all three in parallel
+        RUN_CORE_EUK(
+            euk_proteins_ch,
+            signalp_models_ch,
+            deeploc_installed_ch,
+            parser_ch,
+            phobius_tar_ch,
+            merge_script_ch,
+            params.deeptmhmm
+        )
+
+        RUN_CORE_PROK(
+            prok_proteins_ch,
+            signalp_models_ch,
+            deeploc_installed_ch,
+            parser_ch,
+            phobius_tar_ch,
+            merge_script_ch,
+            params.deeptmhmm
+        )
+
+        RUN_CORE_SHORT(
+            short_proteins_ch,
+            signalp_models_ch,
+            deeploc_installed_ch,
+            parser_ch,
+            phobius_tar_ch,
+            merge_script_ch,
+            params.deeptmhmm
+        )
     }
 }

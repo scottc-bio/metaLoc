@@ -9,3 +9,6 @@ dependencies:
   - pytorch
   - torchvision
   - torchaudio
+  - matplotlib
+  - pillow
+  - libtiff

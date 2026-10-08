@@ -4,6 +4,9 @@
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![DOI](https://zenodo.org/badge/1160772415.svg)](https://doi.org/10.5281/zenodo.18936772)
 
+metaLoc has now been published, please cite:
+(https://doi.org/10.1093/bioadv/vbag169)
+
 ## Introduction
 metaLoc is a reproducible [NextFlow](https://www.nature.com/articles/nbt.3820) workflow for protein localisation prediction from protein amino acid sequences or, in `--meta` mode, from metagenomic nucleotide sequences. 
 
@@ -26,7 +29,7 @@ In `--meta` mode, protein sequences can be predicted from the nucleotide sequenc
 # Requirements
 
 - [Nextflow](https://www.nextflow.io/docs/latest/install.html) ≥ 25.10.2
-  - Tested in 25.10.2 and 25.10.4
+  - Tested in 26.04.6
 - [Miniconda, Conda, or Mamba](https://docs.conda.io/en/latest/) 
 
 *N.B. This workflow was built and tested on a Linux system with local execution*
@@ -64,10 +67,11 @@ nextflow run . -profile test
 
 ```
 
-This will use `assets/test.fasta` which contains two nucleotide sequences:
+This will use `assets/test.fasta` which contains three nucleotide sequences:
 
 - The first 10 Kbp of the first contig of the *Aspergillus nidulans* var. *acristatus* genome assembly [GCA_047715555.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_047715555.1/)
 - The first 10 Kbp of the first contig of the *Escherichia coli* metagenomic genome assembly [GCA_977857295.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_977857295.1/)
+- The second contig (1638 bp) of the *Escherichia coli* J53 genome assembly (GCF_000258865.1) [GCA_000258865.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000258865.1/)
 
 # Parameters
 
@@ -96,6 +100,10 @@ cat assets/augustus_model_list.txt
 ## EukRep filtering
 
 EukRep is unreliable on short contigs. Therefore a minimum contig length must be selected which will be applied to input sequences prior to life domain classification. Values >= 3000 bp are recommended, and values <= 1000 bp are strongly discouraged.
+
+### Short contigs
+
+In metaLoc v1.1, short contigs are now handled as additional prokaryotic contigs with ORFs predicted using prodigal and the same tools utilised for protein sequence characteristic predictions. This will produce an additional set of output directories for "short_contigs".
 
 # Outputs
 
@@ -139,3 +147,10 @@ In `mixed` mode, separate final results are produced for eukaryotic and prokaryo
 This project is distributed under the MIT License. See [LICENSE](LICENSE) for details.
 
 External tools used by this workflow are distributed under their own licenses and must be obtained separately.
+
+# Version history
+
+| Version | Date | Description |
+|---|---|---|
+| v1.0.0 | 2026-03-10 | Initial release of the metaLoc Nextflow workflow |
+| v1.1.0 | 2026-10-08 | Updated workflow to handle short contigs, simplified the SignalP and DeepLoc environment setup |
