@@ -2,7 +2,7 @@
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.10.2-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
-[![DOI](https://zenodo.org/badge/1160772415.svg)](https://doi.org/10.5281/zenodo.18936772)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18936772.svg)](https://doi.org/10.5281/zenodo.18936772)
 
 metaLoc has now been published, please cite:
 (https://doi.org/10.1093/bioadv/vbag169)
