@@ -19,12 +19,12 @@ The workflow schematic can be seen below:
 <img src="docs/workflow.png" width="70%">
 
 ## Core workflow
-Protein sequences are the input for the core workflow. For both eukaryotic and prokaryotic sequences the workflow utilises [SignalP 6.0](https://www.nature.com/articles/s41587-021-01156-3) in `euk` mode for eukaryotic sequences and in `other` mode for prokaryotic sequences for signal peptide prediction. Next [DeepLoc 2.1](https://academic.oup.com/nar/article/52/W1/W215/7642068) is utilised for eukaryotic protein localisation prediction, and [DeepLocPro 1.0](https://academic.oup.com/bioinformatics/article/40/12/btae677/7900293) for prokaryotic protein localisation prediction. Finally, transmembrane helices prediction is performed by [Phobius 1.01](https://academic.oup.com/nar/article/35/suppl_2/W429/2920784) or [DeepTMHMM 1.0](https://www.biorxiv.org/content/10.1101/2022.04.08.487609v1). 
+Protein sequences are the input for the core workflow. For both eukaryotic and prokaryotic sequences the workflow utilises [SignalP 6.0](https://www.nature.com/articles/s41587-021-01156-3) ([Source code](https://github.com/fteufel/signalp-6.0)) in `euk` mode for eukaryotic sequences and in `other` mode for prokaryotic sequences for signal peptide prediction. Next [DeepLoc 2.1](https://academic.oup.com/nar/article/52/W1/W215/7642068) ([Source code](https://github.com/teevee112/DeepLoc-2.0)) is utilised for eukaryotic protein localisation prediction, and [DeepLocPro 1.0](https://academic.oup.com/bioinformatics/article/40/12/btae677/7900293) ([Source code](https://github.com/Jaimomar99/deeplocpro)) for prokaryotic protein localisation prediction. Finally, transmembrane helices prediction is performed by [Phobius 1.01](https://academic.oup.com/nar/article/35/suppl_2/W429/2920784) ([Server](https://phobius.sbc.su.se/data.html)) or [DeepTMHMM 1.0](https://www.biorxiv.org/content/10.1101/2022.04.08.487609v1) ([Server](https://services.healthtech.dtu.dk/services/DeepTMHMM-1.0/)). 
 
 *N.B. DeepTMHMM in this workflow relies on sequence upload for processing, which could be time consuming and unsuitable for sensitive datasets.*
 
 ## Meta mode
-In `--meta` mode, protein sequences can be predicted from the nucleotide sequences. [AUGUSTUS 3.5.0](https://academic.oup.com/bioinformatics/article/24/5/637/202844) utilised the user-selected model to predict genes from eukaryotic contigs. [Prodigal 2.6.3](https://link.springer.com/article/10.1186/1471-2105-11-119) performs ORF prediction from prokaryotic contigs. For sequences of unknown origin or from mixed community sample, [EukRep 0.6.7](https://pmc.ncbi.nlm.nih.gov/articles/PMC5880246/) can be utilised for life domain classification of contigs into eukaryotic or prokaryotic sequences. Both branches of the workflow are then performed simultaneously.
+In `--meta` mode, protein sequences can be predicted from the nucleotide sequences. [AUGUSTUS 3.5.0](https://academic.oup.com/bioinformatics/article/24/5/637/202844) ([Source code](https://github.com/Gaius-Augustus/Augustus)) utilised the user-selected model to predict genes from eukaryotic contigs. [Prodigal 2.6.3](https://link.springer.com/article/10.1186/1471-2105-11-119) ([Source code](https://github.com/hyattpd/Prodigal)) performs ORF prediction from prokaryotic contigs. For sequences of unknown origin or from mixed community sample, [EukRep 0.6.7](https://pmc.ncbi.nlm.nih.gov/articles/PMC5880246/) ([Source code](https://github.com/patrickwest/EukRep)) can be utilised for life domain classification of contigs into eukaryotic or prokaryotic sequences. Both branches of the workflow are then performed simultaneously.
 
 # Requirements
 
@@ -32,7 +32,33 @@ In `--meta` mode, protein sequences can be predicted from the nucleotide sequenc
   - Tested in 26.04.6
 - [Miniconda, Conda, or Mamba](https://docs.conda.io/en/latest/) 
 
-*N.B. This workflow was built and tested on a Linux system with local execution*
+*N.B. This workflow was built and tested on a Linux server with Ubuntu 18.04.6 LTS with dual Intel Xeon Gold 6130 processors. In total, 64 CPUs and 248 GB RAM were available. By default, each process of the workflow is allocated 4 CPUs and 8 Gb RAM.**
+
+## Nextflow environment setup
+
+To install Nextflow using conda, create a dedicated environment.
+
+```bash
+
+conda create -n nextflow_env -c conda-forge -c bioconda nextflow
+
+```
+
+Then activate the environment to use nextflow to run the metaLoc workflow.
+
+```bash
+
+conda activate nextflow_env
+
+```
+
+Check the installation of nextflow.
+
+```bash
+
+nextflow -version
+
+```
 
 # Installation
 
@@ -72,6 +98,8 @@ This will use `assets/test.fasta` which contains three nucleotide sequences:
 - The first 10 Kbp of the first contig of the *Aspergillus nidulans* var. *acristatus* genome assembly [GCA_047715555.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_047715555.1/)
 - The first 10 Kbp of the first contig of the *Escherichia coli* metagenomic genome assembly [GCA_977857295.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_977857295.1/)
 - The second contig (1638 bp) of the *Escherichia coli* J53 genome assembly (GCF_000258865.1) [GCA_000258865.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000258865.1/)
+
+On the system used to develop and test this workflow, the test profile took 6 minutes and 41 seconds to complete. This included time for the initial automatic conda environment setup, which is cached and re-used in for future runs. For example, running a second time without the need for environment setup took only 1 minute and 46 seconds.
 
 # Parameters
 
@@ -141,6 +169,10 @@ In `meta` mode, additional outputs from AUGUSTUS, Prodigal, and EukRep are produ
 The `work/` directory contains per-process intermediate files generated by Nextflow.
 
 In `mixed` mode, separate final results are produced for eukaryotic and prokaryotic sequences.
+
+# Metagenomic application
+
+Applying this workflow to a set of 96,091 mixed microbial metagenomic contigs resulted in the prediction of 1,380,482 protein coding sequences. The entire workflow from metagenomic contigs to protein characteristic prediction and results merging took 10 days 13 hours 23 minutes and 20 seconds to complete.
 
 # License
 
